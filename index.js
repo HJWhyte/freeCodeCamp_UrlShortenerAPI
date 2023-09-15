@@ -45,8 +45,15 @@ app.post('/api/shorturl', function(req, res) {
       // We have valid URL
       else {
         let originalURL = urlObj.href;
-        let short_url = 1;
-        res.json({original_url : originalURL, short_url: short_url})
+        let shortURL = 1;
+        // Create response object - url mapping
+        resObj = {original_url : originalURL, 
+                  short_url: shortURL}
+        // Create object into DB model
+        let newURL = new URLModel(resObj);
+        // Save new model to database
+        newURL.save();
+        res.json(resObj)
       }
     })
   }
