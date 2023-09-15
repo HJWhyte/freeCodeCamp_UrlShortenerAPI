@@ -2,10 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+
+
 let mongoose = require('mongoose'); // Import mongoose requirement for DB
 const bodyParser = require('body-parser'); // Import response body parsing middleware
+const dns = require('dns') // Imports DNS module to allow for url verification
+const url = require('url') // Imports module to create URL objects
 
-app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded({extended: false}));  // use body parser middleware for url encoded info
 
 mongoose.connect(process.env['MONGO_URI'], { useNewUrlParser: true, useUnifiedTopology : true});  // Connect to database API
 
@@ -18,15 +22,21 @@ app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// Your first API endpoint
-app.get('/api/hello', function(req, res) {
-  res.json({ greeting: 'hello API' });
-});
-
 app.post('/api/shorturl', function(req, res) {
-  
-  
+  console.log(req.body);
+  let url = req.body.url;
+  try {
+    let urlObj = new URL(url)
+    console.log(urlObj)
+    dns.lookup(urlObj.hostname, (err, address, family) => {
+      console.log(address)
+    })
+  }
+  catch {
+    res.json({error: "Invalid URL"})
+  }
 });
+  
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
