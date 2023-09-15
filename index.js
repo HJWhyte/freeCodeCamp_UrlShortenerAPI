@@ -7,11 +7,19 @@ const app = express();
 let mongoose = require('mongoose'); // Import mongoose requirement for DB
 const bodyParser = require('body-parser'); // Import response body parsing middleware
 const dns = require('dns') // Imports DNS module to allow for url verification
-const url = require('url') // Imports module to create URL objects
+
 
 app.use(bodyParser.urlencoded({extended: false}));  // use body parser middleware for url encoded info
 
 mongoose.connect(process.env['MONGO_URI'], { useNewUrlParser: true, useUnifiedTopology : true});  // Connect to database API
+
+const urlSchema = new mongoose.Schema({
+  originalURL : {type : String, required: true, unique: true},
+  shortURL : {type : String, required: true, unique: true}
+});
+
+let URLModel = mongoose.model('url', urlSchema);
+
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -36,7 +44,9 @@ app.post('/api/shorturl', function(req, res) {
       }
       // We have valid URL
       else {
-
+        let originalURL = urlObj.href;
+        let short_url = 1;
+        res.json({original_url : originalURL, short_url: short_url})
       }
     })
   }
