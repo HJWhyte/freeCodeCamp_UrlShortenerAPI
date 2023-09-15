@@ -25,11 +25,19 @@ app.get('/', function(req, res) {
 app.post('/api/shorturl', function(req, res) {
   console.log(req.body);
   let url = req.body.url;
+  // Validate URL format
   try {
     urlObj = new URL(url)
     console.log(urlObj)
+    // Check if url corresponds to valid DNS address
     dns.lookup(urlObj.hostname, (err, address, family) => {
-      console.log(address);
+      if (!address) {
+        res.json({error: "Invalid URL"})
+      }
+      // We have valid URL
+      else {
+
+      }
     })
   }
   catch {
