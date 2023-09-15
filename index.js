@@ -14,8 +14,8 @@ app.use(bodyParser.urlencoded({extended: false}));  // use body parser middlewar
 mongoose.connect(process.env['MONGO_URI'], { useNewUrlParser: true, useUnifiedTopology : true});  // Connect to database API
 
 const urlSchema = new mongoose.Schema({
-  originalURL : {type : String, required: true, unique: true},
-  shortURL : {type : String, required: true, unique: true}
+  original_url : {type : String, required: true, unique: true},
+  short_url : {type : String, required: true, unique: true}
 });
 
 let URLModel = mongoose.model('url', urlSchema);
@@ -61,6 +61,22 @@ app.post('/api/shorturl', function(req, res) {
     res.json({error: "Invalid URL"})
   }
 });
+
+app.get('/api/shorturl/:shorturl', function(req, res) {
+  console.log(req.params)
+  // Find short url from database
+  URLModel.findOne({short_url: req.params.shorturl}).then((foundURL) => {
+    console.log(foundURL);
+    // If short URL found redirect to associated original url 
+    if (foundURL) {
+    let original_url = foundURL.original_url
+    res.redirect(original_url)
+    }
+    else {
+      res.json({error: 'No short url found'})
+    }
+  })
+})
   
 
 app.listen(port, function() {
